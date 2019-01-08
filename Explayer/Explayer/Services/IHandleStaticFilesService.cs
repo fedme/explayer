@@ -33,5 +33,7 @@ namespace Explayer.Services
         }
 
         protected abstract Task LoadHtmlFromResource();
+
+        //protected abstract Task<string> DownloadZipFile(string zipName);
     }
 }

@@ -1,9 +1,12 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 using Android.Content;
 using Explayer.Droid.Services;
 using Explayer.Services;
+using System.IO.Compression;
+using Java.Util.Zip;
 using Xamarin.Forms;
 
 [assembly: Dependency(typeof(HandleStaticFilesService))]
@@ -50,6 +53,18 @@ namespace Explayer.Droid.Services
 
             return tcs.Task;
         }
+
+        /*protected override async Task<string> DownloadZipFile(string zipName)
+        {
+            string zipName = "stimuli-v1.0.0.zip";
+            var zipUrl = "https://static.isearchlab.org/explayer/apps/" + zipName;
+            using (var client = new WebClient())
+            {
+                var zipPath = Path.Combine(DirectoryPath, zipName);
+                await client.DownloadFileTaskAsync(zipUrl, zipPath);
+                System.IO.Compression.
+            }
+        }*/
 
         private static void SyncAssets(string assetFolder, string targetDir)
         {
