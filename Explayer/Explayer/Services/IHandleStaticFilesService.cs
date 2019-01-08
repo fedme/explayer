@@ -16,7 +16,7 @@ namespace Explayer.Services
         {
             if (!DirectoryPopulated())
             {
-                using (var loading = UserDialogs.Instance.Loading("Setting up for first time use"))
+                using (var loading = UserDialogs.Instance.Loading("Moving static files to device folder..."))
                 {
                     loading.Show();
                     await LoadHtmlFromResource();
