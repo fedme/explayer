@@ -1,4 +1,5 @@
-﻿using Explayer.Services;
+﻿using Explayer.Server;
+using Explayer.Services;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -33,23 +34,32 @@ namespace Explayer
 
         private async Task StartLocalServer()
         {
+            // Generate server URL
             var url = "http://" + GetLocalIpAddress() + ":8787";
+
+            // Initialize static files and get their path
             var htmlService = DependencyService.Get<IHandleStaticFilesService>();
             await htmlService.InitializeStaticFiles();
             var filePath = htmlService.DirectoryPath;
 
-
-            // Handle when your app starts
+            // Start the web server
             await Task.Factory.StartNew(async () =>
             {
                 using (var server = new WebServer(url))
                 {
+                    // Register static files service
                     server.RegisterModule(new LocalSessionModule());
                     server.RegisterModule(new StaticFilesModule(filePath));
                     server.Module<StaticFilesModule>().UseRamCache = true;
                     server.Module<StaticFilesModule>().DefaultExtension = ".html";
                     server.Module<StaticFilesModule>().DefaultDocument = "index.html";
                     server.Module<StaticFilesModule>().UseGzip = false;
+
+                    // Register socket service
+                    server.RegisterModule(new WebSocketsModule());
+                    server.Module<WebSocketsModule>().RegisterWebSocketsServer<SocketServer>("/socket");
+
+                    // Run server
                     await server.RunAsync();
                 }
             });
