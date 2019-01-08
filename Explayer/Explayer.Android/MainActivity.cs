@@ -6,6 +6,9 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Android.OS;
+using Android.Webkit;
+using Acr.UserDialogs;
+using Explayer.Droid.Services;
 
 namespace Explayer.Droid
 {
@@ -17,9 +20,17 @@ namespace Explayer.Droid
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
 
+            // Initialize services
+            HandleStaticFilesService.Init(this);
+            UserDialogs.Init(this);
+
+            // Initialize and load app
             base.OnCreate(savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
             LoadApplication(new App());
+
+            // Enable webview inspection in chrome
+            WebView.SetWebContentsDebuggingEnabled(true);
         }
     }
 }
