@@ -13,7 +13,6 @@ namespace Explayer
     public partial class App : Application
     {
 
-        private readonly WebView _webView = new WebView();
         private readonly ILocalServer _localServer;
         private readonly IHandleStaticFilesService _staticFilesService;
         private readonly IAppManagerService _appManagerService;
@@ -33,10 +32,7 @@ namespace Explayer
             _staticFilesService = ServiceLocator.Current.GetService<IHandleStaticFilesService>();
             _appManagerService = ServiceLocator.Current.GetService<IAppManagerService>();
 
-            MainPage = new ContentPage
-            {
-                Content = _webView,
-            };
+            MainPage = new NavigationPage(new MainPage());
         }
 
         /// <summary>
@@ -45,23 +41,7 @@ namespace Explayer
         protected override async void OnStart()
         {
             // Start local web server
-            var serverUrl = await _localServer.Start();
-            _webView.Source = serverUrl;
-
-            using (var loading = UserDialogs.Instance.Loading("Downloading demo apps..."))
-            {
-                loading.Show();
-
-                // Download test stimuli and extract it
-                var appName = "stimuli";
-                var appVersion = "1.0.1";
-                var appServerUrl = "https://static.isearchlab.org/explayer/apps";
-                await _appManagerService.DownloadApp(appServerUrl, appName, appVersion);
-
-                appName = "mtt";
-                appVersion = "1.0.0";
-                await _appManagerService.DownloadApp(appServerUrl, appName, appVersion);
-            }
+            _localServer.Start();
         }
 
 

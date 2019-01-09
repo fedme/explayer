@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Explayer.Services
 {
-    interface IHandleStaticFilesService
+    public interface IHandleStaticFilesService
     {
         Task InitializeStaticFiles();
         string DirectoryPath { get; }

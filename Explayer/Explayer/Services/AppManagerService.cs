@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 namespace Explayer.Services
 {
 
-    interface IAppManagerService
+    public interface IAppManagerService
     {
         Task DownloadApp(string serverUrl, string appName, string appVersion);
     }
 
-    class AppManagerService : IAppManagerService
+    public class AppManagerService : IAppManagerService
     {
 
         private readonly IHandleStaticFilesService _staticFilesService;
