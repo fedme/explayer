@@ -1,13 +1,8 @@
-﻿using Explayer.Server;
+﻿using CommonServiceLocator;
+using Explayer.Server;
 using Explayer.Services;
-using System;
-using System.IO;
-using System.IO.Compression;
-using System.Net;
-using System.Net.Sockets;
-using System.Threading.Tasks;
-using Unosquare.Labs.EmbedIO;
-using Unosquare.Labs.EmbedIO.Modules;
+using Unity;
+using Unity.ServiceLocation;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -18,11 +13,24 @@ namespace Explayer
     {
 
         private readonly WebView _webView = new WebView();
-        private IHandleStaticFilesService StaticFilesService;
+        private readonly ILocalServer _localServer;
+        private readonly IHandleStaticFilesService _staticFilesService;
+        private readonly IAppManagerService _appManagerService;
 
+        /// <summary>
+        /// App consturctor
+        /// </summary>
         public App()
         {
             InitializeComponent();
+
+            // Register Services
+            RegisterServices();
+
+            // Inject needed Services
+            _localServer = ServiceLocator.Current.GetService<ILocalServer>();
+            _staticFilesService = ServiceLocator.Current.GetService<IHandleStaticFilesService>();
+            _appManagerService = ServiceLocator.Current.GetService<IAppManagerService>();
 
             MainPage = new ContentPage
             {
@@ -30,94 +38,39 @@ namespace Explayer
             };
         }
 
+        /// <summary>
+        /// Start point of the application
+        /// </summary>
         protected override async void OnStart()
         {
-
-            // Initialize static files and get their path
-            StaticFilesService = DependencyService.Get<IHandleStaticFilesService>();
-
-            // Setup local web server
-            await StartLocalServer();
+            // Start local web server
+            var serverUrl = await _localServer.Start();
+            _webView.Source = serverUrl;
 
             // Download test stimuli and extract it
             var appName = "stimuli";
             var appVersion = "1.0.0";
-            await DownloadApp(appName, appVersion);
+            var appServerUrl = "https://static.isearchlab.org/explayer/apps/";
+            await _appManagerService.DownloadApp(appServerUrl, appName, appVersion);
         }
 
-        private async Task DownloadApp(string appName, string appVersion)
+
+        /// <summary>
+        /// Registers services in the service container
+        /// </summary>
+        private void RegisterServices()
         {
-            var zipName = appName + "-v" + appVersion + ".zip";
-            var zipUrl = "https://static.isearchlab.org/explayer/apps/" + zipName;
+            var unityContainer = new UnityContainer();
 
-            // Create app directory if it does not exist
-            var appFolder = Path.Combine(StaticFilesService.DirectoryPath, appName);
-            if (!Directory.Exists(appFolder)) Directory.CreateDirectory(appFolder);
+            // register any service you like with the scheme interface, service
+            unityContainer.RegisterType<ILocalServer, LocalServer>();
+            unityContainer.RegisterType<IAppManagerService, AppManagerService>();
+            unityContainer.RegisterInstance<IHandleStaticFilesService>(Xamarin.Forms.DependencyService.Get<IHandleStaticFilesService>());          
 
-            // Create app version directory if it does not exist
-            var appVersionFolder = Path.Combine(appFolder, appVersion);
-            if (!Directory.Exists(appVersionFolder)) Directory.CreateDirectory(appVersionFolder);
-
-            // Download app zip file
-            var zipPath = Path.Combine(appVersionFolder, zipName);
-            using (var client = new WebClient())
-            {
-                await client.DownloadFileTaskAsync(zipUrl, zipPath);
-            }
-
-            // Extract app zip file
-            ZipFile.ExtractToDirectory(zipPath, appVersionFolder);
-            File.Delete(zipPath);
+            ServiceLocator.SetLocatorProvider(() =>
+                new UnityServiceLocator(unityContainer));
         }
 
-        private async Task StartLocalServer()
-        {
-            // Generate server URL
-            var url = "http://" + GetLocalIpAddress() + ":8787";
-
-            
-            await StaticFilesService.InitializeStaticFiles();
-            var filePath = StaticFilesService.DirectoryPath;
-
-            // Start the web server
-            await Task.Factory.StartNew(async () =>
-            {
-                using (var server = new WebServer(url))
-                {
-                    // Register static files service
-                    server.RegisterModule(new LocalSessionModule());
-                    server.RegisterModule(new StaticFilesModule(filePath));
-                    server.Module<StaticFilesModule>().UseRamCache = true;
-                    server.Module<StaticFilesModule>().DefaultExtension = ".html";
-                    server.Module<StaticFilesModule>().DefaultDocument = "index.html";
-                    server.Module<StaticFilesModule>().UseGzip = false;
-
-                    // Register socket service
-                    server.RegisterModule(new WebSocketsModule());
-                    server.Module<WebSocketsModule>().RegisterWebSocketsServer<SocketServer>("/socket");
-
-                    // Run server
-                    await server.RunAsync();
-                }
-            });
-
-            _webView.Source = url;
-        }
-
-        private static string GetLocalIpAddress()
-        {
-            var listener = new TcpListener(IPAddress.Loopback, 0);
-
-            try
-            {
-                listener.Start();
-                return ((IPEndPoint)listener.LocalEndpoint).Address.ToString();
-            }
-            finally
-            {
-                listener.Stop();
-            }
-        }
 
         protected override void OnSleep()
         {
