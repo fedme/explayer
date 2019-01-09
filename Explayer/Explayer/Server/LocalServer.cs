@@ -40,7 +40,7 @@ namespace Explayer.Server
                     // Register static files service
                     server.RegisterModule(new LocalSessionModule());
                     server.RegisterModule(new StaticFilesModule(filePath));
-                    server.Module<StaticFilesModule>().UseRamCache = true;
+                    server.Module<StaticFilesModule>().UseRamCache = false;
                     server.Module<StaticFilesModule>().DefaultExtension = ".html";
                     server.Module<StaticFilesModule>().DefaultDocument = "index.html";
                     server.Module<StaticFilesModule>().UseGzip = false;

@@ -1,4 +1,5 @@
-﻿using CommonServiceLocator;
+﻿using Acr.UserDialogs;
+using CommonServiceLocator;
 using Explayer.Server;
 using Explayer.Services;
 using Unity;
@@ -47,11 +48,20 @@ namespace Explayer
             var serverUrl = await _localServer.Start();
             _webView.Source = serverUrl;
 
-            // Download test stimuli and extract it
-            var appName = "stimuli";
-            var appVersion = "1.0.0";
-            var appServerUrl = "https://static.isearchlab.org/explayer/apps/";
-            await _appManagerService.DownloadApp(appServerUrl, appName, appVersion);
+            using (var loading = UserDialogs.Instance.Loading("Downloading demo apps..."))
+            {
+                loading.Show();
+
+                // Download test stimuli and extract it
+                var appName = "stimuli";
+                var appVersion = "1.0.1";
+                var appServerUrl = "https://static.isearchlab.org/explayer/apps";
+                await _appManagerService.DownloadApp(appServerUrl, appName, appVersion);
+
+                appName = "mtt";
+                appVersion = "1.0.0";
+                await _appManagerService.DownloadApp(appServerUrl, appName, appVersion);
+            }
         }
 
 
