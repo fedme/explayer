@@ -1,4 +1,5 @@
 ﻿using Acr.UserDialogs;
+using CommonServiceLocator;
 using Explayer.Services;
 using System;
 using System.Collections.Generic;
@@ -12,18 +13,13 @@ using Xamarin.Forms.Xaml;
 namespace Explayer
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class DownloadApp : ContentPage
+    public partial class DownloadAppPage : ContentPage
     {
         private readonly IAppManagerService _appManager;
 
-        public DownloadApp()
+        public DownloadAppPage()
         {
-            InitializeComponent();
-        }
-
-        public DownloadApp(IAppManagerService appManager)
-        {
-            _appManager = appManager;
+            _appManager = ServiceLocator.Current.GetService<IAppManagerService>();
             InitializeComponent();
         }
 
@@ -36,7 +32,6 @@ namespace Explayer
             using (var loading = UserDialogs.Instance.Loading("Downloading app..."))
             {
                 loading.Show();
-
                 // Download app
                 await _appManager.DownloadApp(appServerUrl, appName, appVersion);
             }

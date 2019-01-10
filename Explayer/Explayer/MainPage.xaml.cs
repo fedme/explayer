@@ -19,7 +19,12 @@ namespace Explayer
 
         async void OnDownloadAppButtonClicked(object sender, EventArgs args)
         {
-            await Navigation.PushAsync(new DownloadApp());
+            await Navigation.PushAsync(new DownloadAppPage());
+        }
+
+        async void OnOpenWebViewButtonClicked(object sender, EventArgs args)
+        {
+            await Navigation.PushAsync(new DownloadAppPage());
         }
     }
 }
