@@ -1,5 +1,6 @@
 ﻿using Acr.UserDialogs;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
@@ -11,16 +12,40 @@ namespace Explayer.Services
     public interface IAppManagerService
     {
         Task DownloadApp(string serverUrl, string appName, string appVersion);
+        List<string> GetInstalledAppNames();
+        List<string> GetAppInstalledVersionStrings(string appName);
     }
 
     public class AppManagerService : IAppManagerService
     {
-
+        private List<string> appNames;
         private readonly IHandleStaticFilesService _staticFilesService;
 
         public AppManagerService(IHandleStaticFilesService staticFilesService)
         {
             _staticFilesService = staticFilesService;
+        }
+
+        public List<string> GetAppInstalledVersionStrings(string appName)
+        {
+            var versionStrings = new List<string>();
+            var appFolder = new DirectoryInfo(Path.Combine(_staticFilesService.DirectoryPath, appName));
+            foreach (var folder in appFolder.GetDirectories())
+            {
+                versionStrings.Add(folder.Name);
+            }
+            return versionStrings;
+        }
+
+        public List<string> GetInstalledAppNames()
+        {
+            var appNames = new List<string>();
+            var appsFolder = new DirectoryInfo(_staticFilesService.DirectoryPath);
+            foreach (var folder in appsFolder.GetDirectories())
+            {
+                appNames.Add(folder.Name);
+            }
+            return appNames;
         }
 
         /// <summary>
@@ -70,6 +95,8 @@ namespace Explayer.Services
                 // Show success toast
                 var toastConfig = new ToastConfig($"App Downloaded!").SetDuration(4000);
                 UserDialogs.Instance.Toast(toastConfig);
+
+                RefreshInstalledAppNames();
             }
             catch (Exception e) //TODO: Better exception handling
             {

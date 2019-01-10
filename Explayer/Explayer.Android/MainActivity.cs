@@ -24,6 +24,11 @@ namespace Explayer.Droid
             HandleStaticFilesService.Init(this);
             UserDialogs.Init(this);
 
+            // Go full screen
+            // TODO: Move to cross-platform service
+            this.Window.AddFlags(WindowManagerFlags.Fullscreen);
+            this.Window.AddFlags(WindowManagerFlags.KeepScreenOn);
+
             // Initialize and load app
             base.OnCreate(savedInstanceState);
             global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
