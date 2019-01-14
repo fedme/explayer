@@ -1,4 +1,5 @@
 ﻿using Acr.UserDialogs;
+using Explayer.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,13 +13,12 @@ namespace Explayer.Services
     public interface IAppManagerService
     {
         Task DownloadApp(string serverUrl, string appName, string appVersion);
-        List<string> GetInstalledAppNames();
-        List<string> GetAppInstalledVersionStrings(string appName);
+        List<WebApp> GetInstalledApps();
     }
 
     public class AppManagerService : IAppManagerService
     {
-        private List<string> appNames;
+
         private readonly IHandleStaticFilesService _staticFilesService;
 
         public AppManagerService(IHandleStaticFilesService staticFilesService)
@@ -26,26 +26,21 @@ namespace Explayer.Services
             _staticFilesService = staticFilesService;
         }
 
-        public List<string> GetAppInstalledVersionStrings(string appName)
+        /// <summary>
+        /// Get the list of installed Web Apps
+        /// </summary>
+        /// <returns>List of installed Web Apps</returns>
+        public List<WebApp> GetInstalledApps()
         {
-            var versionStrings = new List<string>();
-            var appFolder = new DirectoryInfo(Path.Combine(_staticFilesService.DirectoryPath, appName));
-            foreach (var folder in appFolder.GetDirectories())
-            {
-                versionStrings.Add(folder.Name);
-            }
-            return versionStrings;
-        }
-
-        public List<string> GetInstalledAppNames()
-        {
-            var appNames = new List<string>();
+            var apps = new List<WebApp>();
             var appsFolder = new DirectoryInfo(_staticFilesService.DirectoryPath);
             foreach (var folder in appsFolder.GetDirectories())
             {
-                appNames.Add(folder.Name);
+                var app = new WebApp(folder.Name);
+                app.InstalledVersions = GetAppInstalledVersionStrings(folder.Name);
+                apps.Add(app);
             }
-            return appNames;
+            return apps;
         }
 
         /// <summary>
@@ -95,8 +90,6 @@ namespace Explayer.Services
                 // Show success toast
                 var toastConfig = new ToastConfig($"App Downloaded!").SetDuration(4000);
                 UserDialogs.Instance.Toast(toastConfig);
-
-                RefreshInstalledAppNames();
             }
             catch (Exception e) //TODO: Better exception handling
             {
@@ -106,11 +99,17 @@ namespace Explayer.Services
             }
         }
 
-        /// <summary>
-        /// Checks if a file exists on a public URL
-        /// </summary>
-        /// <param name="url">URL of the file to check</param>
-        /// <returns>True if file exists, false otherwise</returns>
+        private List<string> GetAppInstalledVersionStrings(string appName)
+        {
+            var versionStrings = new List<string>();
+            var appFolder = new DirectoryInfo(Path.Combine(_staticFilesService.DirectoryPath, appName));
+            foreach (var folder in appFolder.GetDirectories())
+            {
+                versionStrings.Add(folder.Name);
+            }
+            return versionStrings;
+        }
+
         private bool RemoteFileExists(string url)
         {
             try

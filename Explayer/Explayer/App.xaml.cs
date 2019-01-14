@@ -1,7 +1,8 @@
-﻿using Acr.UserDialogs;
-using CommonServiceLocator;
+﻿using CommonServiceLocator;
 using Explayer.Server;
 using Explayer.Services;
+using Explayer.ViewModels;
+using Explayer.Views;
 using Unity;
 using Unity.ServiceLocation;
 using Xamarin.Forms;
@@ -14,8 +15,6 @@ namespace Explayer
     {
 
         private readonly ILocalServer _localServer;
-        private readonly IHandleStaticFilesService _staticFilesService;
-        private readonly IAppManagerService _appManagerService;
 
         /// <summary>
         /// App consturctor
@@ -29,8 +28,7 @@ namespace Explayer
 
             // Inject needed Services
             _localServer = ServiceLocator.Current.GetService<ILocalServer>();
-            _staticFilesService = ServiceLocator.Current.GetService<IHandleStaticFilesService>();
-            _appManagerService = ServiceLocator.Current.GetService<IAppManagerService>();
+            var a = ServiceLocator.Current.GetInstance<AppLaunchViewModel>();
 
             MainPage = new NavigationPage(new MainPage());
         }
@@ -41,7 +39,7 @@ namespace Explayer
         protected override async void OnStart()
         {
             // Start local web server
-            _localServer.Start();
+            await _localServer.Start();
         }
 
 
@@ -52,10 +50,13 @@ namespace Explayer
         {
             var unityContainer = new UnityContainer();
 
-            // register any service you like with the scheme interface, service
+            // register services
             unityContainer.RegisterType<ILocalServer, LocalServer>();
+            unityContainer.RegisterInstance<IHandleStaticFilesService>(Xamarin.Forms.DependencyService.Get<IHandleStaticFilesService>());
             unityContainer.RegisterType<IAppManagerService, AppManagerService>();
-            unityContainer.RegisterInstance<IHandleStaticFilesService>(Xamarin.Forms.DependencyService.Get<IHandleStaticFilesService>());          
+
+            // register viewmodels
+            unityContainer.RegisterSingleton<AppLaunchViewModel>();
 
             ServiceLocator.SetLocatorProvider(() =>
                 new UnityServiceLocator(unityContainer));

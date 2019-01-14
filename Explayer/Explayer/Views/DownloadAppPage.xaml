@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="Explayer.DownloadAppPage">
+             x:Class="Explayer.Views.DownloadAppPage"
+             Title="Download a new app">
+    
     <ContentPage.Content>
         <StackLayout>
-            
-            <Label Text="Download app from server:" />
-            
+
             <Entry x:Name="serverUrlEntry"
                    Text="https://appstore.isearchlab.org" />
 

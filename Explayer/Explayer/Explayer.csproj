@@ -17,19 +17,25 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="DownloadAppPage.xaml.cs">
+    <Compile Update="Views\DownloadAppPage.xaml.cs">
       <DependentUpon>DownloadAppPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\AppLaunchPage.xaml.cs">
+      <DependentUpon>AppLaunchPage.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="DownloadAppPage.xaml">
+    <EmbeddedResource Update="Views\DownloadAppPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="MainPage.xaml">
+    <EmbeddedResource Update="Views\AppLaunchPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="PlayerPage.xaml">
+    <EmbeddedResource Update="Views\MainPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\PlayerPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
   </ItemGroup>
