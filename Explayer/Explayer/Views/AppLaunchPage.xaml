@@ -23,8 +23,7 @@
             <Button Text="{Binding LaunchAppMessage}"
                     Command="{Binding LaunchAppCommand}"/>
 
-
-
+            
         </StackLayout>
 
         

@@ -28,7 +28,6 @@ namespace Explayer
 
             // Inject needed Services
             _localServer = ServiceLocator.Current.GetService<ILocalServer>();
-            var a = ServiceLocator.Current.GetInstance<AppLaunchViewModel>();
 
             MainPage = new NavigationPage(new MainPage());
         }

@@ -1,8 +1,5 @@
 ﻿using CommonServiceLocator;
-using Explayer.Services;
 using Explayer.ViewModels;
-using System;
-using System.Collections.Generic;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -15,7 +12,7 @@ namespace Explayer.Views
         public AppLaunchPage ()
 		{
             InitializeComponent ();
-            //this.BindingContext = ServiceLocator.Current.GetInstance<MainViewModel>();
+            //BindingContext = ServiceLocator.Current.GetInstance<AppLaunchViewModel>();
         }
 
         protected override bool OnBackButtonPressed()
@@ -23,7 +20,16 @@ namespace Explayer.Views
             return true;
         }
 
-   
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+
+            // Refresh list of installed apps
+            var vm = BindingContext as AppLaunchViewModel;
+            vm.Refresh();
+        }
+
+
     }
 
 

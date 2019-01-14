@@ -1,5 +1,7 @@
 ﻿using Acr.UserDialogs;
+using CommonServiceLocator;
 using Explayer.Models;
+using Explayer.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -21,7 +23,9 @@ namespace Explayer.Services
 
         private readonly IHandleStaticFilesService _staticFilesService;
 
-        public AppManagerService(IHandleStaticFilesService staticFilesService)
+        public AppManagerService(
+            IHandleStaticFilesService staticFilesService
+            )
         {
             _staticFilesService = staticFilesService;
         }

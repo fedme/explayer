@@ -1,4 +1,5 @@
-﻿using Explayer.Models;
+﻿using Acr.UserDialogs;
+using Explayer.Models;
 using Explayer.Services;
 using Explayer.Views;
 using System.Collections.ObjectModel;
@@ -16,6 +17,13 @@ namespace Explayer.ViewModels
             _appManager = appManager;
             _webApps = new ObservableCollection<WebApp>(_appManager.GetInstalledApps());
             LaunchAppMessage = "Please select an app (and version)";
+        }
+
+        public void Refresh()
+        {
+            _webApps = new ObservableCollection<WebApp>(_appManager.GetInstalledApps());
+            LaunchAppMessage = "Please select an app (and version)";
+            InstalledVersions = new ObservableCollection<string>();
         }
 
         ObservableCollection<WebApp> _webApps;
@@ -37,6 +45,7 @@ namespace Explayer.ViewModels
             {
                 if (_selectedWebApp != value)
                 {
+                    // TODO: check selected app not null
                     _selectedWebApp = value;
                     InstalledVersions = new ObservableCollection<string>(_selectedWebApp.InstalledVersions);
                     SelectedWebAppVersion = _selectedWebApp.PreferredVersion;
@@ -99,7 +108,16 @@ namespace Explayer.ViewModels
 
         private async Task LaunchApp()
         {
-            await Navigation.PushAsync(new AppPlayerPage(SelectedWebApp.Name, SelectedWebApp.PreferredVersion));
+            if (SelectedWebApp == null || string.IsNullOrEmpty(SelectedWebAppVersion))
+            {
+                // Show toast
+                var toastConfig = new ToastConfig("Please choose the app (and version) to run!").SetDuration(4000);
+                UserDialogs.Instance.Toast(toastConfig);
+            }
+            else
+            {
+                await Navigation.PushAsync(new AppPlayerPage(SelectedWebApp.Name, SelectedWebApp.PreferredVersion));
+            }
         }
     }
 }
