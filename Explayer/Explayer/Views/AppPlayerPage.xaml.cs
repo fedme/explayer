@@ -1,27 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿using Acr.UserDialogs;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
 namespace Explayer.Views
 {
 	[XamlCompilation(XamlCompilationOptions.Compile)]
-	public partial class PlayerPage : ContentPage
+	public partial class AppPlayerPage : ContentPage
 	{
-		public PlayerPage ()
+
+        public AppPlayerPage ()
 		{
             NavigationPage.SetHasNavigationBar(this, false);
             InitializeComponent ();
 		}
 
-        private void OnGoButtonClicked(object sender, EventArgs e)
+        public AppPlayerPage(string appName, string preferredVersion)
         {
-            webview.Source = addressEntry.Text;
+            NavigationPage.SetHasNavigationBar(this, false);
+            InitializeComponent();
+            webview.Source = $"http://127.0.0.1:8787/{appName}/{preferredVersion}/index.html";
+
+            // Show toast
+            var toastConfig = new ToastConfig($"Loading {appName} v{preferredVersion}...").SetDuration(4000);
+            UserDialogs.Instance.Toast(toastConfig);
         }
+
+        //private void OnGoButtonClicked(object sender, EventArgs e)
+        //{
+        //    webview.Source = addressEntry.Text;
+        //}
 
         protected override bool OnBackButtonPressed()
         {

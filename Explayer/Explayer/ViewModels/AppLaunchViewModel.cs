@@ -99,7 +99,7 @@ namespace Explayer.ViewModels
 
         private async Task LaunchApp()
         {
-            await Navigation.PushAsync(new PlayerPage());
+            await Navigation.PushAsync(new AppPlayerPage(SelectedWebApp.Name, SelectedWebApp.PreferredVersion));
         }
     }
 }
