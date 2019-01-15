@@ -17,12 +17,12 @@ namespace Explayer.Views
 			InitializeComponent ();
 		}
 
-        async void OnAppLaunchButtonClicked(object sender, EventArgs args)
+		private async void OnAppLaunchButtonClicked(object sender, EventArgs args)
         {
             await Navigation.PushAsync(new AppLaunchPage());
         }
 
-        async void OnAppInstallButtonClicked(object sender, EventArgs args)
+        private async void OnAppInstallButtonClicked(object sender, EventArgs args)
         {
             await Navigation.PushAsync(new DownloadAppPage());
         }

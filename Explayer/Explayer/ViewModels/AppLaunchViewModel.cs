@@ -3,6 +3,7 @@ using Explayer.Models;
 using Explayer.Services;
 using Explayer.Views;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 
@@ -16,16 +17,24 @@ namespace Explayer.ViewModels
         {
             _appManager = appManager;
             _webApps = new ObservableCollection<WebApp>(_appManager.GetInstalledApps());
+            InstalledVersions = new ObservableCollection<string>();
             LaunchAppMessage = "Please select an app (and version)";
         }
 
         public void Refresh()
         {
-            _webApps = new ObservableCollection<WebApp>(_appManager.GetInstalledApps());
+            _webApps.Clear();
+            _appManager.GetInstalledApps().ForEach(app => _webApps.Add(app));
+            // app preferred version is lost here!
+       
             LaunchAppMessage = "Please select an app (and version)";
-            InstalledVersions = SelectedWebApp != null ? 
-                new ObservableCollection<string>(SelectedWebApp.InstalledVersions) 
-                : new ObservableCollection<string>();
+
+            if (_appManager.GetCurrentWebApp() != null)
+            {
+                SelectedWebApp = _webApps.FirstOrDefault(
+                    app => app.Name == _appManager.GetCurrentWebApp()?.Name );
+            }
+            
         }
 
         private ObservableCollection<WebApp> _webApps;
@@ -48,10 +57,13 @@ namespace Explayer.ViewModels
                 if (_selectedWebApp == value) return;
                 _selectedWebApp = value;
 
-                if (SelectedWebApp != null)
+                if (_selectedWebApp != null)
                 {
-                    InstalledVersions = new ObservableCollection<string>(_selectedWebApp.InstalledVersions);
-                    SelectedWebAppVersion = SelectedWebApp.PreferredVersion;
+                    InstalledVersions.Clear();
+                    SelectedWebApp.InstalledVersions.ForEach(version => InstalledVersions.Add(version));
+//                    SelectedWebAppVersion = InstalledVersions.FirstOrDefault(
+//                        version => version == SelectedWebApp.PreferredVersion);
+                    SelectedWebAppVersion = InstalledVersions.First(); // TODO: select preferred version instead
                     LaunchAppMessage = $"Launch {SelectedWebApp.Name} v{SelectedWebApp.PreferredVersion}";
                 }
 
@@ -78,10 +90,9 @@ namespace Explayer.ViewModels
             {
                 if (_selectedWebAppVersion == value) return;
                 _selectedWebAppVersion = value;
-                if (SelectedWebApp != null)
+                if (_selectedWebApp != null)
                 {
-                    SelectedWebApp.PreferredVersion = value;
-                    LaunchAppMessage = $"Launch {SelectedWebApp.Name} v{SelectedWebApp.PreferredVersion}";
+                    LaunchAppMessage = $"Launch {_selectedWebApp.Name} v{value}";
                 }
                 OnPropertyChanged();
             }
@@ -114,13 +125,18 @@ namespace Explayer.ViewModels
         {
             if (SelectedWebApp == null || string.IsNullOrEmpty(SelectedWebAppVersion))
             {
-                // Show toast
+                // Show validation error toast
                 var toastConfig = new ToastConfig("Please choose the app (and version) to run!")
                     .SetDuration(4000);
                 UserDialogs.Instance.Toast(toastConfig);
             }
             else
             {
+                // Remember app version and set it as current app
+                SelectedWebApp.PreferredVersion = SelectedWebAppVersion;
+                _appManager.SetCurrentWebApp(SelectedWebApp);
+                
+                // Navigate to web app player
                 await Navigation.PushAsync(new AppPlayerPage(
                     SelectedWebApp.Name, SelectedWebApp.PreferredVersion));
             }

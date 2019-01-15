@@ -16,12 +16,15 @@ namespace Explayer.Services
     {
         Task DownloadApp(string serverUrl, string appName, string appVersion);
         List<WebApp> GetInstalledApps();
+        WebApp GetCurrentWebApp();
+        void SetCurrentWebApp(WebApp app);
     }
 
     public class AppManagerService : IAppManagerService
     {
 
         private readonly IHandleStaticFilesService _staticFilesService;
+        private WebApp _currentWebApp;
 
         public AppManagerService(
             IHandleStaticFilesService staticFilesService
@@ -30,6 +33,17 @@ namespace Explayer.Services
             _staticFilesService = staticFilesService;
         }
 
+        public WebApp GetCurrentWebApp()
+        {
+            return _currentWebApp;
+        }
+        
+        public void SetCurrentWebApp(WebApp app)
+        {
+            _currentWebApp = app;
+        }
+
+
         /// <summary>
         /// Get the list of installed Web Apps
         /// </summary>
@@ -37,8 +51,10 @@ namespace Explayer.Services
         public List<WebApp> GetInstalledApps()
         {
             var appsFolder = new DirectoryInfo(_staticFilesService.DirectoryPath);
-            return appsFolder.GetDirectories().Select(folder => 
-                new WebApp(folder.Name) {InstalledVersions = GetAppInstalledVersionStrings(folder.Name)}).ToList();
+            return appsFolder.GetDirectories()
+                .Select(folder => 
+                    new WebApp(folder.Name) {InstalledVersions = GetAppInstalledVersionStrings(folder.Name)})
+                .ToList();
         }
 
         /// <summary>
@@ -102,7 +118,10 @@ namespace Explayer.Services
         private List<string> GetAppInstalledVersionStrings(string appName)
         {
             var appFolder = new DirectoryInfo(Path.Combine(_staticFilesService.DirectoryPath, appName));
-            return appFolder.GetDirectories().Select(folder => folder.Name).ToList();
+            return appFolder.GetDirectories()
+                .OrderByDescending(folder => folder.Name)
+                .Select(folder => folder.Name)
+                .ToList();
         }
 
         private static bool RemoteFileExists(string url)

@@ -26,7 +26,7 @@ namespace Explayer.Views
 
             // Refresh list of installed apps
             var vm = BindingContext as AppLaunchViewModel;
-            vm.Refresh();
+            vm?.Refresh();
         }
 
 

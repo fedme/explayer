@@ -11,12 +11,12 @@
             <Picker x:Name="AppPicker" 
                 Title="Select App" 
                 ItemsSource="{Binding WebApps}"
-                SelectedItem="{Binding SelectedWebApp}" 
+                SelectedItem="{Binding SelectedWebApp, Mode=TwoWay}" 
                 ItemDisplayBinding="{Binding Name}" />
 
             <Picker x:Name="AppVersionPicker" 
                 Title="Select App Version" 
-                ItemsSource="{Binding InstalledVersions}"
+                ItemsSource="{Binding InstalledVersions, Mode=TwoWay}"
                 SelectedItem="{Binding SelectedWebAppVersion}" />
 
 
