@@ -18,10 +18,11 @@ namespace Explayer.Views
         {
             NavigationPage.SetHasNavigationBar(this, false);
             InitializeComponent();
-            webview.Source = $"http://127.0.0.1:8787/{appName}/{preferredVersion}/index.html";
+            Webview.Source = $"http://127.0.0.1:8787/{appName}/{preferredVersion}/index.html";
 
             // Show toast
-            var toastConfig = new ToastConfig($"Loading {appName} v{preferredVersion}...").SetDuration(4000);
+            var toastConfig = new ToastConfig($"Loading {appName} v{preferredVersion}...")
+                .SetDuration(4000);
             UserDialogs.Instance.Toast(toastConfig);
         }
 
@@ -33,7 +34,12 @@ namespace Explayer.Views
         protected override bool OnBackButtonPressed()
         {
             Device.BeginInvokeOnMainThread(async () => {
-                var result = await this.DisplayAlert("Leave Session?", "You will lose all unsaved data from this session. Click anywhere to dismiss this message and remain here.", "Yes, exit and lose all data", "No, stay here");
+                
+                var result = await this.DisplayAlert("Leave Session?", 
+                    "You will lose all unsaved data from this session. " +
+                    "Click anywhere to dismiss this message and remain here.", 
+                    "Yes, exit and lose all data", "No, stay here");
+                
                 if (result) await this.Navigation.PopAsync(); // or anything else
             });
 

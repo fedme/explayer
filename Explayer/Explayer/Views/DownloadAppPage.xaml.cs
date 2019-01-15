@@ -23,11 +23,11 @@ namespace Explayer.Views
             InitializeComponent();
         }
 
-        async void OnDownloadButtonClicked(object sender, EventArgs args)
+        private async void OnDownloadButtonClicked(object sender, EventArgs args)
         {
-            var appServerUrl = serverUrlEntry.Text;
-            var appName = appNameEntry.Text;
-            var appVersion = appVersionEntry.Text;
+            var appServerUrl = ServerUrlEntry.Text;
+            var appName = AppNameEntry.Text;
+            var appVersion = AppVersionEntry.Text;
 
             using (var loading = UserDialogs.Instance.Loading("Downloading app..."))
             {

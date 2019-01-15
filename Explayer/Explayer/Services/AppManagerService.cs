@@ -4,8 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Xamarin.Forms;
 
 namespace Explayer.Services
 {
@@ -34,20 +36,15 @@ namespace Explayer.Services
         /// <returns>List of installed Web Apps</returns>
         public List<WebApp> GetInstalledApps()
         {
-            var apps = new List<WebApp>();
             var appsFolder = new DirectoryInfo(_staticFilesService.DirectoryPath);
-            foreach (var folder in appsFolder.GetDirectories())
-            {
-                var app = new WebApp(folder.Name);
-                app.InstalledVersions = GetAppInstalledVersionStrings(folder.Name);
-                apps.Add(app);
-            }
-            return apps;
+            return appsFolder.GetDirectories().Select(folder => 
+                new WebApp(folder.Name) {InstalledVersions = GetAppInstalledVersionStrings(folder.Name)}).ToList();
         }
 
         /// <summary>
         /// Downloads an app from the server
         /// </summary>
+        /// <param name="serverUrl">Url of the app server</param>
         /// <param name="appName">Name of the app</param>
         /// <param name="appVersion">Version string</param>
         /// <returns></returns>
@@ -72,9 +69,9 @@ namespace Explayer.Services
                 else {
                     // if directory already exists, delete everything in it
                     var di = new DirectoryInfo(appVersionFolder);
-                    foreach (FileInfo file in di.GetFiles())
+                    foreach (var file in di.GetFiles())
                         file.Delete();
-                    foreach (DirectoryInfo dir in di.GetDirectories())
+                    foreach (var dir in di.GetDirectories())
                         dir.Delete(true);
                 }
 
@@ -93,40 +90,41 @@ namespace Explayer.Services
                 var toastConfig = new ToastConfig($"App Downloaded!").SetDuration(4000);
                 UserDialogs.Instance.Toast(toastConfig);
             }
-            catch (Exception e) //TODO: Better exception handling
+            catch (Exception e) // TODO: Better exception handling
             {
                 // Show error toast
-                var toastConfig = new ToastConfig($"Error while downloading app: {e.Message}").SetDuration(4000);
+                var toastConfig = new ToastConfig($"Error while downloading app: {e.Message}")
+                    .SetDuration(4000);
                 UserDialogs.Instance.Toast(toastConfig);
             }
         }
 
         private List<string> GetAppInstalledVersionStrings(string appName)
         {
-            var versionStrings = new List<string>();
             var appFolder = new DirectoryInfo(Path.Combine(_staticFilesService.DirectoryPath, appName));
-            foreach (var folder in appFolder.GetDirectories())
-            {
-                versionStrings.Add(folder.Name);
-            }
-
-            return versionStrings;
+            return appFolder.GetDirectories().Select(folder => folder.Name).ToList();
         }
 
-        private bool RemoteFileExists(string url)
+        private static bool RemoteFileExists(string url)
         {
             try
             {
-                HttpWebRequest request = WebRequest.Create(url) as HttpWebRequest;
-                request.Method = "HEAD";
-                HttpWebResponse response = request.GetResponse() as HttpWebResponse;
-                response.Close();
-                return (response.StatusCode == HttpStatusCode.OK);
+                if (WebRequest.Create(url) is HttpWebRequest request)
+                {
+                    request.Method = "HEAD";
+                    if (request.GetResponse() is HttpWebResponse response)
+                    {
+                        response.Close();
+                        return (response.StatusCode == HttpStatusCode.OK);
+                    }
+                }
             }
             catch
             {
                 return false;
             }
-        }
+
+            return false;
+        }   
     }
 }

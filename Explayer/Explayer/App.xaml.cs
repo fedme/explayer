@@ -16,9 +16,6 @@ namespace Explayer
 
         private readonly ILocalServer _localServer;
 
-        /// <summary>
-        /// App consturctor
-        /// </summary>
         public App()
         {
             InitializeComponent();
@@ -55,7 +52,7 @@ namespace Explayer
                 Xamarin.Forms.DependencyService.Get<IHandleStaticFilesService>());
             unityContainer.RegisterType<IAppManagerService, AppManagerService>();
 
-            // register viewmodels
+            // register Viewmodels
             unityContainer.RegisterSingleton<AppLaunchViewModel>();
 
             ServiceLocator.SetLocatorProvider(() =>

@@ -7,13 +7,13 @@
     <ContentPage.Content>
         <StackLayout>
 
-            <Entry x:Name="serverUrlEntry"
+            <Entry x:Name="ServerUrlEntry"
                    Text="https://appstore.isearchlab.org" />
 
-            <Entry x:Name="appNameEntry"
+            <Entry x:Name="AppNameEntry"
                    Text="stimuli" />
 
-            <Entry x:Name="appVersionEntry"
+            <Entry x:Name="AppVersionEntry"
                    Text="1.0.1" />
             
             <Button Text="Download App"
