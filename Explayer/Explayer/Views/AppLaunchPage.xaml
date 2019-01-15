@@ -8,13 +8,13 @@
     <ContentPage.Content>
         <StackLayout>
 
-            <Picker x:Name="appPicker" 
+            <Picker x:Name="AppPicker" 
                 Title="Select App" 
                 ItemsSource="{Binding WebApps}"
                 SelectedItem="{Binding SelectedWebApp}" 
                 ItemDisplayBinding="{Binding Name}" />
 
-            <Picker x:Name="appVersionPicker" 
+            <Picker x:Name="AppVersionPicker" 
                 Title="Select App Version" 
                 ItemsSource="{Binding InstalledVersions}"
                 SelectedItem="{Binding SelectedWebAppVersion}" />

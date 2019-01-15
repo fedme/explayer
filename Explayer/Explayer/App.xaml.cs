@@ -51,7 +51,8 @@ namespace Explayer
 
             // register services
             unityContainer.RegisterType<ILocalServer, LocalServer>();
-            unityContainer.RegisterInstance<IHandleStaticFilesService>(Xamarin.Forms.DependencyService.Get<IHandleStaticFilesService>());
+            unityContainer.RegisterInstance<IHandleStaticFilesService>(
+                Xamarin.Forms.DependencyService.Get<IHandleStaticFilesService>());
             unityContainer.RegisterType<IAppManagerService, AppManagerService>();
 
             // register viewmodels

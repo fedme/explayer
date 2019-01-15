@@ -7,9 +7,7 @@ namespace Explayer.ViewModels
 {
     public class ViewModelLocator
     {
-        public AppLaunchViewModel AppLaunchViewModel
-        {
-            get { return ServiceLocator.Current.GetInstance<AppLaunchViewModel>(); }
-        }
+        public AppLaunchViewModel AppLaunchViewModel => 
+            ServiceLocator.Current.GetInstance<AppLaunchViewModel>();
     }
 }

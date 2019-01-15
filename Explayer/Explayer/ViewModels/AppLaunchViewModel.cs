@@ -23,20 +23,15 @@ namespace Explayer.ViewModels
         {
             _webApps = new ObservableCollection<WebApp>(_appManager.GetInstalledApps());
             LaunchAppMessage = "Please select an app (and version)";
-            if (SelectedWebApp != null)
-            {
-                InstalledVersions = new ObservableCollection<string>(SelectedWebApp.InstalledVersions);
-            }
-            else
-            {
-                InstalledVersions = new ObservableCollection<string>();
-            }
+            InstalledVersions = SelectedWebApp != null ? 
+                new ObservableCollection<string>(SelectedWebApp.InstalledVersions) 
+                : new ObservableCollection<string>();
         }
 
-        ObservableCollection<WebApp> _webApps;
+        private ObservableCollection<WebApp> _webApps;
         public ObservableCollection<WebApp> WebApps
         {
-            get { return _webApps; }
+            get => _webApps;
             set
             {
                 _webApps = value;
@@ -44,32 +39,30 @@ namespace Explayer.ViewModels
             }
         }
 
-        WebApp _selectedWebApp;
+        private WebApp _selectedWebApp;
         public WebApp SelectedWebApp
         {
-            get { return _selectedWebApp; }
+            get => _selectedWebApp;
             set
             {
-                if (_selectedWebApp != value)
+                if (_selectedWebApp == value) return;
+                _selectedWebApp = value;
+
+                if (SelectedWebApp != null)
                 {
-                    _selectedWebApp = value;
-
-                    if (SelectedWebApp != null)
-                    {
-                        InstalledVersions = new ObservableCollection<string>(_selectedWebApp.InstalledVersions);
-                        SelectedWebAppVersion = SelectedWebApp.PreferredVersion;
-                        LaunchAppMessage = $"Launch {SelectedWebApp.Name} v{SelectedWebApp.PreferredVersion}";
-                    }
-
-                    OnPropertyChanged();
+                    InstalledVersions = new ObservableCollection<string>(_selectedWebApp.InstalledVersions);
+                    SelectedWebAppVersion = SelectedWebApp.PreferredVersion;
+                    LaunchAppMessage = $"Launch {SelectedWebApp.Name} v{SelectedWebApp.PreferredVersion}";
                 }
+
+                OnPropertyChanged();
             }
         }
 
-        ObservableCollection<string> _installedVersions;
+        private ObservableCollection<string> _installedVersions;
         public ObservableCollection<string> InstalledVersions
         {
-            get { return _installedVersions; }
+            get => _installedVersions;
             set
             {
                 _installedVersions = value;
@@ -77,41 +70,37 @@ namespace Explayer.ViewModels
             }
         }
 
-        string _selectedWebAppVersion;
+        private string _selectedWebAppVersion;
         public string SelectedWebAppVersion
         {
-            get { return _selectedWebAppVersion; }
+            get => _selectedWebAppVersion;
             set
             {
-                if (_selectedWebAppVersion != value)
+                if (_selectedWebAppVersion == value) return;
+                _selectedWebAppVersion = value;
+                if (SelectedWebApp != null)
                 {
-                    _selectedWebAppVersion = value;
-                    if (SelectedWebApp != null)
-                    {
-                        SelectedWebApp.PreferredVersion = value;
-                        LaunchAppMessage = $"Launch {SelectedWebApp.Name} v{SelectedWebApp.PreferredVersion}";
-                    }
-                    OnPropertyChanged();
+                    SelectedWebApp.PreferredVersion = value;
+                    LaunchAppMessage = $"Launch {SelectedWebApp.Name} v{SelectedWebApp.PreferredVersion}";
                 }
+                OnPropertyChanged();
             }
         }
 
-        string _launchAppMessage;
+        private string _launchAppMessage;
         public string LaunchAppMessage
         {
-            get { return _launchAppMessage; }
+            get => _launchAppMessage;
             set
             {
-                if (_launchAppMessage != value)
-                {
-                    _launchAppMessage = value;
-                    OnPropertyChanged();
-                }
+                if (_launchAppMessage == value) return;
+                _launchAppMessage = value;
+                OnPropertyChanged();
             }
         }
 
 
-        Command _launchCommand;
+        private Command _launchCommand;
         public Command LaunchAppCommand
         {
             get

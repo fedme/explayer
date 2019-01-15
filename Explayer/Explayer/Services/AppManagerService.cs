@@ -1,7 +1,5 @@
 ﻿using Acr.UserDialogs;
-using CommonServiceLocator;
 using Explayer.Models;
-using Explayer.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.IO;
