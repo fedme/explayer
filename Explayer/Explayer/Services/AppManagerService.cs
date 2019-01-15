@@ -111,6 +111,7 @@ namespace Explayer.Services
             {
                 versionStrings.Add(folder.Name);
             }
+
             return versionStrings;
         }
 

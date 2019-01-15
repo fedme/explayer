@@ -23,7 +23,14 @@ namespace Explayer.ViewModels
         {
             _webApps = new ObservableCollection<WebApp>(_appManager.GetInstalledApps());
             LaunchAppMessage = "Please select an app (and version)";
-            InstalledVersions = new ObservableCollection<string>();
+            if (SelectedWebApp != null)
+            {
+                InstalledVersions = new ObservableCollection<string>(SelectedWebApp.InstalledVersions);
+            }
+            else
+            {
+                InstalledVersions = new ObservableCollection<string>();
+            }
         }
 
         ObservableCollection<WebApp> _webApps;
@@ -45,11 +52,15 @@ namespace Explayer.ViewModels
             {
                 if (_selectedWebApp != value)
                 {
-                    // TODO: check selected app not null
                     _selectedWebApp = value;
-                    InstalledVersions = new ObservableCollection<string>(_selectedWebApp.InstalledVersions);
-                    SelectedWebAppVersion = _selectedWebApp.PreferredVersion;
-                    LaunchAppMessage = $"Launch {SelectedWebApp.Name} v{SelectedWebApp.PreferredVersion}";
+
+                    if (SelectedWebApp != null)
+                    {
+                        InstalledVersions = new ObservableCollection<string>(_selectedWebApp.InstalledVersions);
+                        SelectedWebAppVersion = SelectedWebApp.PreferredVersion;
+                        LaunchAppMessage = $"Launch {SelectedWebApp.Name} v{SelectedWebApp.PreferredVersion}";
+                    }
+
                     OnPropertyChanged();
                 }
             }
@@ -75,8 +86,11 @@ namespace Explayer.ViewModels
                 if (_selectedWebAppVersion != value)
                 {
                     _selectedWebAppVersion = value;
-                    SelectedWebApp.PreferredVersion = value;
-                    LaunchAppMessage = $"Launch {SelectedWebApp.Name} v{SelectedWebApp.PreferredVersion}";
+                    if (SelectedWebApp != null)
+                    {
+                        SelectedWebApp.PreferredVersion = value;
+                        LaunchAppMessage = $"Launch {SelectedWebApp.Name} v{SelectedWebApp.PreferredVersion}";
+                    }
                     OnPropertyChanged();
                 }
             }
@@ -102,7 +116,8 @@ namespace Explayer.ViewModels
         {
             get
             {
-                return _launchCommand ?? (_launchCommand = new Command(async () => await LaunchApp()));
+                return _launchCommand ?? (_launchCommand = new Command(
+                    async () => await LaunchApp()));
             }
         }
 
@@ -111,12 +126,14 @@ namespace Explayer.ViewModels
             if (SelectedWebApp == null || string.IsNullOrEmpty(SelectedWebAppVersion))
             {
                 // Show toast
-                var toastConfig = new ToastConfig("Please choose the app (and version) to run!").SetDuration(4000);
+                var toastConfig = new ToastConfig("Please choose the app (and version) to run!")
+                    .SetDuration(4000);
                 UserDialogs.Instance.Toast(toastConfig);
             }
             else
             {
-                await Navigation.PushAsync(new AppPlayerPage(SelectedWebApp.Name, SelectedWebApp.PreferredVersion));
+                await Navigation.PushAsync(new AppPlayerPage(
+                    SelectedWebApp.Name, SelectedWebApp.PreferredVersion));
             }
         }
     }
