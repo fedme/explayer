@@ -1,6 +1,5 @@
 # Explayer
-A native player for web apps
+A native player for web apps. 
+Used inside iSearch to run web-based experiments offline on Android tablet.
 
-## Author
-Federico Meini
-iSearch Lab
+Please note that this is a work in progress! Do not use in production!
